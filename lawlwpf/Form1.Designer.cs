@@ -1,17 +1,16 @@
 ﻿
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
-using Microsoft.VisualBasic.ApplicationServices;
+using Counter_Pranker;
 
-namespace lawlwpf
+namespace Counter_Prankster_Namespace
 {
-    partial class Form1
+    partial class MainForm
     {
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
@@ -22,19 +21,13 @@ namespace lawlwpf
         [DllImport("user32.dll")]
         public static extern bool LockWorkStation();
 
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        private GlobalKeyboardHook _globalKeyboardHook;
         bool isCameraRunning = false;
         bool tomandoFoto = false;
         public static bool x = false;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -44,20 +37,7 @@ namespace lawlwpf
             base.Dispose(disposing);
         }
 
-
-
-        private GlobalKeyboardHook _globalKeyboardHook;
-
-        private void buttonHook_Click(object sender, EventArgs e)
-        {
-            // Hooks only into specified Keys (here "A" and "B").
-            //_globalKeyboardHook = new GlobalKeyboardHook(new Keys[] { Keys.A, Keys.B });
-
-            // Hooks into all keys.
-            _globalKeyboardHook = new GlobalKeyboardHook();
-            _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
-        }
-
+        // https://stackoverflow.com/questions/604410/global-keyboard-capture-in-c-sharp-application
         private void OnKeyPressed(object sender, GlobalKeyboardHookEventArgs e)
         {
             Cursor.Hide();
@@ -95,12 +75,15 @@ namespace lawlwpf
                     break;
                 }
             }
-            pictureBox1.Image = bitmap;
+            
+            pictureBox1.Image = new PictureMaster().DrawPicture(bitmap, "output.jpg");
             this.TopMost = true;
-            //MessageBox.Show("MIREN NO MAS QUIEN VA A INVITAR LAS TORTILLAS AHORA");
-            label1.Text = "MIREN NO MAS QUIEN VA A INVITAR LAS TORTILLAS AHORA";
             tomandoFoto = false;
             _globalKeyboardHook.KeyboardPressed -= OnKeyPressed;
+            label1.Text = "Sonrie!";
+            this.WindowState = FormWindowState.Maximized;
+            this.Show();
+            
             new Thread(ByeBye).Start();
         }
 
@@ -114,19 +97,23 @@ namespace lawlwpf
         static void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             bitmap = (Bitmap)eventArgs.Frame.Clone();
-            bitmap.Save("tortillas.jpg");
+            bitmap.Save("output_prank.jpg");
 
             x = true;
             
         }
-        #region Windows Form Designer generated code
 
         private void SetItUp()
         {
-
+            
             _globalKeyboardHook = new GlobalKeyboardHook();
             _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
+            label1.Text = "listening...";
+            
+
         }
+
+        #region Windows Form Designer generated code
 
         /// <summary>
         ///  Required method for Designer support - do not modify
@@ -134,64 +121,95 @@ namespace lawlwpf
         /// </summary>
         private void InitializeComponent()
         {
-            SetItUp();
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(MainForm));
             pictureBox1 = new PictureBox();
             tableLayoutPanel1 = new TableLayoutPanel();
+            tableLayoutPanel2 = new TableLayoutPanel();
             label1 = new Label();
+            beginBtn = new Button();
             ((ISupportInitialize)pictureBox1).BeginInit();
             tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
             // 
             pictureBox1.Dock = DockStyle.Fill;
-            pictureBox1.Location = new Point(3, 58);
+            pictureBox1.InitialImage = (Image)resources.GetObject("pictureBox1.InitialImage");
+            pictureBox1.Location = new Point(3, 53);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(776, 492);
+            pictureBox1.Size = new Size(776, 197);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
+            pictureBox1.Click += pictureBox1_Click;
             // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(pictureBox1, 0, 1);
-            tableLayoutPanel1.Controls.Add(label1, 0, 0);
+            tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 2;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 90F));
-            tableLayoutPanel1.Size = new Size(782, 553);
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 80F));
+            tableLayoutPanel1.Size = new Size(782, 253);
             tableLayoutPanel1.TabIndex = 1;
+            // 
+            // tableLayoutPanel2
+            // 
+            tableLayoutPanel2.ColumnCount = 2;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.Controls.Add(label1, 0, 0);
+            tableLayoutPanel2.Controls.Add(beginBtn, 1, 0);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
+            tableLayoutPanel2.Location = new Point(3, 3);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 1;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel2.Size = new Size(776, 44);
+            tableLayoutPanel2.TabIndex = 1;
             // 
             // label1
             // 
-            label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 25.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label1.Dock = DockStyle.Fill;
+            label1.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label1.Location = new Point(3, 0);
             label1.Name = "label1";
-            label1.Size = new Size(776, 55);
-            label1.TabIndex = 1;
+            label1.Size = new Size(614, 44);
+            label1.TabIndex = 2;
+            label1.Text = "Ready";
             label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // Form1
+            // beginBtn
+            // 
+            beginBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            beginBtn.Location = new Point(623, 3);
+            beginBtn.Name = "beginBtn";
+            beginBtn.Size = new Size(150, 38);
+            beginBtn.TabIndex = 3;
+            beginBtn.Text = "Start";
+            beginBtn.UseVisualStyleBackColor = true;
+            beginBtn.Click += beginBtn_Click;
+            // 
+            // MainForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoValidate = AutoValidate.EnableAllowFocusChange;
-            ClientSize = new Size(782, 553);
+            ClientSize = new Size(782, 253);
             Controls.Add(tableLayoutPanel1);
-            Name = "Form1";
-            Text = "Form1";
-            WindowState = FormWindowState.Maximized;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Name = "MainForm";
+            Text = "Counter Prankster";
             FormClosing += Form1_FormClosing;
             ((ISupportInitialize)pictureBox1).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel1.PerformLayout();
+            tableLayoutPanel2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -199,6 +217,8 @@ namespace lawlwpf
 
         private PictureBox pictureBox1;
         private TableLayoutPanel tableLayoutPanel1;
+        private TableLayoutPanel tableLayoutPanel2;
         private Label label1;
+        private Button beginBtn;
     }
 }
